@@ -1,4 +1,4 @@
-# 📈 BIGA (BigaFund) - 机构级公募基金量化投研与资产配置工作站
+# 📈 BIGA 机构级公募基金量化投研与资产配置工作站
 
 <p align="center">
   <img src="src/BigaFund/Assets/app_icon.png" width="96" height="96" alt="BIGA Logo" />
