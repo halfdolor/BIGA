@@ -1,0 +1,29 @@
+## Visual Studio & .NET Build Artifacts
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+*.log
+
+## Visual Studio Cache & Temporary Files
+.vs/
+*.user
+*.suo
+*.userprefs
+*.docstates
+
+## Published Output & Binary Archives
+publish/
+dist/
+*.zip
+*.7z
+*.tar.gz
+
+## Test Results
+TestResults/
+[Tt]est[Rr]esult*/
+
+## Local Database & Cache
+*.duckdb
+*.duckdb.tmp
+*.duckdb.wal

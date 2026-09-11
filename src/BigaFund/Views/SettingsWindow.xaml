@@ -1,0 +1,131 @@
+﻿<Window x:Class="BigaFund.Views.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="BIGA - 系统首选项与量化参数配置" 
+        Height="540" Width="520"
+        WindowStartupLocation="CenterOwner"
+        Background="#181825" Foreground="#CDD6F4"
+        ResizeMode="NoResize"
+        FontFamily="Segoe UI, Microsoft YaHei UI">
+    <Grid Margin="22">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,16">
+            <TextBlock Text="⚙️ 系统首选项与量化参数" FontSize="18" FontWeight="Bold" Foreground="#89B4FA"/>
+            <TextBlock Text="配置 DuckDB 持久化存储的量化风控基准利率、费率模型与策略预设" FontSize="12" Foreground="#6C7086" Margin="0,4,0,0"/>
+        </StackPanel>
+
+        <!-- Body -->
+        <Border Grid.Row="1" Background="#1E1E2E" CornerRadius="8" Padding="18" BorderBrush="#313244" BorderThickness="1">
+            <StackPanel>
+                <!-- 无风险利率 -->
+                <Grid Margin="0,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="110"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <TextBlock Text="无风险年化基准利率 (Rf)" FontSize="13" FontWeight="SemiBold" Foreground="#CDD6F4"/>
+                        <TextBlock Text="用于折算夏普比率、索提诺比率与 CAPM Alpha" FontSize="11" Foreground="#6C7086" Margin="0,2,0,0"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <TextBox x:Name="TxtRiskFreeRate" Text="2.0" Width="60" Background="#313244" Foreground="#F9E2AF" 
+                                 BorderBrush="#45475A" Padding="6,4" TextAlignment="Right" FontWeight="Bold"/>
+                        <TextBlock Text=" %" VerticalAlignment="Center" Foreground="#A6ADC8" Margin="4,0,0,0"/>
+                    </StackPanel>
+                </Grid>
+
+                <Separator Background="#313244" Margin="0,0,0,16"/>
+
+                <!-- 申购费率折扣 -->
+                <Grid Margin="0,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="110"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <TextBlock Text="默认申购手续费率 (折扣后)" FontSize="13" FontWeight="SemiBold" Foreground="#CDD6F4"/>
+                        <TextBlock Text="主流互联网平台通常 1 折优惠，一般为 0.10%~0.15%" FontSize="11" Foreground="#6C7086" Margin="0,2,0,0"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <TextBox x:Name="TxtFeeRate" Text="0.10" Width="60" Background="#313244" Foreground="#A6E3A1" 
+                                 BorderBrush="#45475A" Padding="6,4" TextAlignment="Right" FontWeight="Bold"/>
+                        <TextBlock Text=" %" VerticalAlignment="Center" Foreground="#A6ADC8" Margin="4,0,0,0"/>
+                    </StackPanel>
+                </Grid>
+
+                <Separator Background="#313244" Margin="0,0,0,16"/>
+
+                <!-- 默认定投金额 -->
+                <Grid Margin="0,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="110"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <TextBlock Text="默认每期定投基准金额" FontSize="13" FontWeight="SemiBold" Foreground="#CDD6F4"/>
+                        <TextBlock Text="普通定投、均线择时与止盈策略的单期基准本金" FontSize="11" Foreground="#6C7086" Margin="0,2,0,0"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <TextBox x:Name="TxtDefaultDcaAmount" Text="1000" Width="60" Background="#313244" Foreground="#89B4FA" 
+                                 BorderBrush="#45475A" Padding="6,4" TextAlignment="Right" FontWeight="Bold"/>
+                        <TextBlock Text=" 元" VerticalAlignment="Center" Foreground="#A6ADC8" Margin="4,0,0,0"/>
+                    </StackPanel>
+                </Grid>
+
+                <Separator Background="#313244" Margin="0,0,0,16"/>
+
+                <!-- 目标止盈阈值 -->
+                <Grid Margin="0,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="110"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <TextBlock Text="目标收益止盈定投阈值" FontSize="13" FontWeight="SemiBold" Foreground="#CDD6F4"/>
+                        <TextBlock Text="当单轮定投收益率达到此阈值自动全部赎回锁定收益" FontSize="11" Foreground="#6C7086" Margin="0,2,0,0"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <TextBox x:Name="TxtTargetProfitRate" Text="15.0" Width="60" Background="#313244" Foreground="#F38BA8" 
+                                 BorderBrush="#45475A" Padding="6,4" TextAlignment="Right" FontWeight="Bold"/>
+                        <TextBlock Text=" %" VerticalAlignment="Center" Foreground="#A6ADC8" Margin="4,0,0,0"/>
+                    </StackPanel>
+                </Grid>
+
+                <Separator Background="#313244" Margin="0,0,0,16"/>
+
+                <!-- 网格套利间距 -->
+                <Grid Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="110"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <TextBlock Text="网格交易策略价格间距" FontSize="13" FontWeight="SemiBold" Foreground="#CDD6F4"/>
+                        <TextBlock Text="动态网格每格触碰加减仓百分比步长" FontSize="11" Foreground="#6C7086" Margin="0,2,0,0"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <TextBox x:Name="TxtGridSpacing" Text="3.0" Width="60" Background="#313244" Foreground="#FAB387" 
+                                 BorderBrush="#45475A" Padding="6,4" TextAlignment="Right" FontWeight="Bold"/>
+                        <TextBlock Text=" %" VerticalAlignment="Center" Foreground="#A6ADC8" Margin="4,0,0,0"/>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+        </Border>
+
+        <!-- Footer Buttons -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+            <Button Content="重置默认" Width="90" Margin="0,0,10,0"
+                    Background="#313244" Foreground="#A6ADC8" BorderBrush="#45475A" Padding="0,6"
+                    Click="BtnReset_Click"/>
+            <Button Content="保存首选项" Width="110"
+                    Background="#89B4FA" Foreground="#11111B" BorderThickness="0" FontWeight="Bold" Padding="0,6"
+                    Click="BtnSave_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

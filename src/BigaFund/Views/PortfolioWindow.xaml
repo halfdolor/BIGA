@@ -1,0 +1,208 @@
+<Window x:Class="BigaFund.Views.PortfolioWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:sp="clr-namespace:ScottPlot.WPF;assembly=ScottPlot.WPF"
+        Title="BIGA - 基金组合资产配置与多资产回测工作站 (Portfolio Workbench)" 
+        Height="860" Width="1260"
+        WindowStartupLocation="CenterOwner"
+        Background="#11111B" Foreground="#CDD6F4"
+        FontFamily="Microsoft YaHei UI, Segoe UI">
+    <Grid Margin="18,14">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <!-- 0. 组合配置与权重设定区 -->
+            <RowDefinition Height="*"/>    <!-- 1. ScottPlot 组合净值走势图 -->
+            <RowDefinition Height="Auto"/> <!-- 2. 组合核心量化指标看板 -->
+        </Grid.RowDefinitions>
+
+        <!-- 0. 组合配置与权重设定区 -->
+        <Border Grid.Row="0" Background="#1E1E2E" BorderBrush="#313244" BorderThickness="1" CornerRadius="8" Padding="14,10" Margin="0,0,0,12">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- 顶行：操作栏 -->
+                <Grid Grid.Row="0" Margin="0,0,0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="🧩 资产配置组合:" FontWeight="Bold" FontSize="14" Foreground="#89B4FA" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                        <TextBox x:Name="TxtAddFundCode" Text="000001" Width="80" Background="#181825" Foreground="#CDD6F4"
+                                 BorderBrush="#45475A" Padding="6,3" FontWeight="Bold" VerticalContentAlignment="Center"/>
+                        <Button Content="➕ 添加基金" Width="85" Margin="8,0,14,0"
+                                Background="#313244" Foreground="#CDD6F4" BorderBrush="#45475A" FontWeight="SemiBold" Padding="0,4"
+                                Click="BtnAddFund_Click"/>
+                    </StackPanel>
+
+                    <!-- 预设经典配置快速选基 -->
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,16,0">
+                        <TextBlock Text="快速搭组合: " Foreground="#6C7086" FontSize="12" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                        <Button Content="股债平衡(000001+000171)" Tag="000001,000171" Background="#181825" Foreground="#BAC2DE" BorderBrush="#313244" Padding="6,2" Margin="0,0,6,0" FontSize="11" Click="BtnQuickTemplate_Click"/>
+                        <Button Content="核心成长(005827+161005)" Tag="005827,161005" Background="#181825" Foreground="#BAC2DE" BorderBrush="#313244" Padding="6,2" FontSize="11" Click="BtnQuickTemplate_Click"/>
+                    </StackPanel>
+
+                    <!-- 回测周期选择 -->
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,16,0">
+                        <TextBlock Text="回测周期: " Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                        <ComboBox x:Name="CmbTimeRange" SelectedIndex="0" Foreground="#FFFFFF" Width="125"
+                                  SelectionChanged="CmbTimeRange_SelectionChanged">
+                            <ComboBoxItem Content="全部交集 (ALL)" Tag="ALL"/>
+                            <ComboBoxItem Content="近1个月 (1M)" Tag="1M"/>
+                            <ComboBoxItem Content="近3个月 (3M)" Tag="3M"/>
+                            <ComboBoxItem Content="近6个月 (6M)" Tag="6M"/>
+                            <ComboBoxItem Content="近1年 (1Y)" Tag="1Y"/>
+                            <ComboBoxItem Content="近3年 (3Y)" Tag="3Y"/>
+                            <ComboBoxItem Content="近5年 (5Y)" Tag="5Y"/>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <!-- 权重校验提示 -->
+                    <TextBlock x:Name="TxtWeightStatus" Grid.Column="3" Text="当前总权重: 100% (有效)" 
+                               Foreground="#A6E3A1" FontWeight="Bold" FontSize="13" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,16,0"/>
+
+                    <!-- 回测按钮 -->
+                    <Button Grid.Column="4" Content="🚀 开始组合回测" Width="120"
+                            Background="#F5B041" Foreground="#11111B" BorderThickness="0" FontWeight="Bold" Padding="0,7"
+                            Cursor="Hand" Click="BtnRunPortfolio_Click"/>
+
+                    <!-- 导出 CSV 研报 -->
+                    <Button Grid.Column="5" Content="📥 导出组合研报" Width="120" Margin="8,0,0,0"
+                            Background="#A6E3A1" Foreground="#11111B" BorderThickness="0" FontWeight="Bold" Padding="0,7"
+                            Cursor="Hand" Click="BtnExportCsv_Click"/>
+                </Grid>
+
+                <!-- 底行：成分基金权重列表 -->
+                <DataGrid x:Name="GridComponents" Grid.Row="1" AutoGenerateColumns="False" CanUserAddRows="False"
+                          Background="#181825" Foreground="#CDD6F4" BorderBrush="#313244" RowBackground="#181825"
+                          AlternatingRowBackground="#1E1E2E" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#313244"
+                          HeadersVisibility="Column" FontSize="12" MaxHeight="130">
+                    <DataGrid.ColumnHeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="Background" Value="#313244"/>
+                            <Setter Property="Foreground" Value="#CDD6F4"/>
+                            <Setter Property="FontWeight" Value="SemiBold"/>
+                            <Setter Property="Padding" Value="8,4"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                        </Style>
+                    </DataGrid.ColumnHeaderStyle>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="基金代码" Binding="{Binding Code}" Width="90" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="基金全称" Binding="{Binding Name}" Width="200" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="基金类型" Binding="{Binding Type}" Width="130" IsReadOnly="True"/>
+                        <DataGridTemplateColumn Header="配置权重 (%)" Width="140">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBox Text="{Binding WeightPercent, UpdateSourceTrigger=LostFocus}" 
+                                             Background="#313244" Foreground="#F9E2AF" BorderThickness="1" BorderBrush="#45475A" 
+                                             Padding="4,2" TextAlignment="Right" FontWeight="Bold" LostFocus="Weight_LostFocus"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="操作" Width="80">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button Content="移除" Background="#F38BA8" Foreground="#11111B" BorderThickness="0" 
+                                            FontWeight="Bold" Padding="6,2" Cursor="Hand" Click="BtnRemoveComponent_Click"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </Border>
+
+        <!-- 1. ScottPlot 组合净值走势图与交互 HUD -->
+        <Border Grid.Row="1" Background="#1E1E2E" BorderBrush="#313244" BorderThickness="1" CornerRadius="8" Padding="0" Margin="0,0,0,12">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Border Background="#181825" Padding="10,6" BorderBrush="#313244" BorderThickness="0,0,0,1">
+                    <TextBlock x:Name="TxtPortfolioHud" Text="💡 移动鼠标至走势图区域可交互查看精准组合点位" Foreground="#89B4FA" FontSize="12" VerticalAlignment="Center"/>
+                </Border>
+                <sp:WpfPlot x:Name="PortfolioPlot" Grid.Row="1"/>
+            </Grid>
+        </Border>
+
+        <!-- 2. 组合核心量化风控指标看板 -->
+        <Border Grid.Row="2" Background="#1E1E2E" BorderBrush="#313244" BorderThickness="1" CornerRadius="8" Padding="14,10">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Grid Margin="0,0,0,8">
+                    <TextBlock Text="📈 组合多资产配置量化绩效与风险调整回报看板" FontSize="13" FontWeight="Bold" Foreground="#89B4FA"/>
+                    <TextBlock x:Name="TxtDateRange" Text="统计区间: 待回测" HorizontalAlignment="Right" Foreground="#A6ADC8" FontSize="11"/>
+                </Grid>
+
+                <!-- 指标卡片网格 -->
+                <UniformGrid Grid.Row="1" Rows="1" Columns="6">
+                    <!-- 组合累计收益 -->
+                    <Border Background="#181825" CornerRadius="6" Padding="10,8" Margin="0,0,8,0">
+                        <StackPanel>
+                            <TextBlock Text="组合累计收益率" Foreground="#A6ADC8" FontSize="11"/>
+                            <TextBlock x:Name="TxtTotalReturn" Text="--%" Foreground="#A6E3A1" FontSize="16" FontWeight="Bold" Margin="0,4,0,0"/>
+                            <TextBlock x:Name="TxtBenchmarkReturn" Text="同期沪深300: --%" Foreground="#6C7086" FontSize="10" Margin="0,2,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 组合年化 CAGR -->
+                    <Border Background="#181825" CornerRadius="6" Padding="10,8" Margin="0,0,8,0">
+                        <StackPanel>
+                            <TextBlock Text="复合年化收益 (CAGR)" Foreground="#A6ADC8" FontSize="11"/>
+                            <TextBlock x:Name="TxtCagr" Text="--%" Foreground="#89B4FA" FontSize="16" FontWeight="Bold" Margin="0,4,0,0"/>
+                            <TextBlock Text="A股250交易日标准" Foreground="#6C7086" FontSize="10" Margin="0,2,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 组合波动率 -->
+                    <Border Background="#181825" CornerRadius="6" Padding="10,8" Margin="0,0,8,0">
+                        <StackPanel>
+                            <TextBlock Text="组合年化波动率" Foreground="#A6ADC8" FontSize="11"/>
+                            <TextBlock x:Name="TxtVolatility" Text="--%" Foreground="#F9E2AF" FontSize="16" FontWeight="Bold" Margin="0,4,0,0"/>
+                            <TextBlock Text="收益波动离散度" Foreground="#6C7086" FontSize="10" Margin="0,2,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 最大回撤 -->
+                    <Border Background="#181825" CornerRadius="6" Padding="10,8" Margin="0,0,8,0">
+                        <StackPanel>
+                            <TextBlock Text="组合历史最大回撤" Foreground="#A6ADC8" FontSize="11"/>
+                            <TextBlock x:Name="TxtMaxDrawdown" Text="--%" Foreground="#F38BA8" FontSize="16" FontWeight="Bold" Margin="0,4,0,0"/>
+                            <TextBlock Text="极值峰谷最大亏损" Foreground="#6C7086" FontSize="10" Margin="0,2,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 夏普比率 -->
+                    <Border Background="#181825" CornerRadius="6" Padding="10,8" Margin="0,0,8,0">
+                        <StackPanel>
+                            <TextBlock Text="组合夏普比率 (Sharpe)" Foreground="#A6ADC8" FontSize="11"/>
+                            <TextBlock x:Name="TxtSharpe" Text="--" Foreground="#CBA6F7" FontSize="16" FontWeight="Bold" Margin="0,4,0,0"/>
+                            <TextBlock Text="无风险利率 Rf=2.0%" Foreground="#6C7086" FontSize="10" Margin="0,2,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 分散化降波增益 -->
+                    <Border Background="#181825" CornerRadius="6" Padding="10,8">
+                        <StackPanel>
+                            <TextBlock Text="资产分散化降波度" Foreground="#A6ADC8" FontSize="11"/>
+                            <TextBlock x:Name="TxtDivBenefit" Text="--%" Foreground="#94E2D5" FontSize="16" FontWeight="Bold" Margin="0,4,0,0"/>
+                            <TextBlock Text="MPT马科维茨降波效应" Foreground="#6C7086" FontSize="10" Margin="0,2,0,0"/>
+                        </StackPanel>
+                    </Border>
+                </UniformGrid>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

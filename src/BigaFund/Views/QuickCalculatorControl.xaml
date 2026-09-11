@@ -1,0 +1,170 @@
+<UserControl x:Class="BigaFund.Views.QuickCalculatorControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sp="clr-namespace:ScottPlot.WPF;assembly=ScottPlot.WPF"
+             Background="#11111B" Foreground="#CDD6F4"
+             FontFamily="Segoe UI, Microsoft YaHei UI">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <Grid Margin="28,20" MaxWidth="1180" HorizontalAlignment="Left">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- 标题栏 -->
+            <Border Grid.Row="0" Background="#1E1E2E" BorderBrush="#313244" BorderThickness="1" CornerRadius="8" Padding="18,14" Margin="0,0,0,16">
+                <StackPanel>
+                    <TextBlock Text="🧮 快速复利与定投试算工具 (Compound Interest &amp; DCA)" FontSize="18" FontWeight="Bold" Foreground="#89B4FA"/>
+                    <TextBlock Text="科学测算初始本金与定期定投在不同年化收益率与投资年限下的财富复利效应，直观感受时间与复利的巨大力量" FontSize="12" Foreground="#A6ADC8" Margin="0,4,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <!-- 核心计算体 (左右双栏布局) -->
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="380"/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- 左栏：参数设置 -->
+                <Border Grid.Column="0" Background="#1E1E2E" CornerRadius="8" Padding="20,18" BorderBrush="#313244" BorderThickness="1">
+                    <StackPanel>
+                        <TextBlock Text="⚙️ 投资与定投参数设定" Foreground="#F5B041" FontWeight="Bold" FontSize="14" Margin="0,0,0,16"/>
+
+                        <!-- 初始本金 -->
+                        <TextBlock Text="初始投资本金 (元)" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="12" Margin="0,0,0,6"/>
+                        <TextBox x:Name="TxtPrincipal" Text="10000" Background="#181825" Foreground="#FFFFFF" BorderBrush="#45475A" Padding="10,7" FontWeight="Bold" Margin="0,0,0,14" TextChanged="Input_Changed"/>
+
+                        <!-- 每期定投 -->
+                        <TextBlock Text="每期定投金额 (元)" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="12" Margin="0,0,0,6"/>
+                        <TextBox x:Name="TxtPeriodic" Text="1000" Background="#181825" Foreground="#FFFFFF" BorderBrush="#45475A" Padding="10,7" FontWeight="Bold" Margin="0,0,0,14" TextChanged="Input_Changed"/>
+
+                        <!-- 定投频率 -->
+                        <TextBlock Text="定投周期频率" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="12" Margin="0,0,0,6"/>
+                        <ComboBox x:Name="CmbFrequency" SelectedIndex="0" Foreground="#FFFFFF" Padding="8,5" Margin="0,0,0,14" SelectionChanged="Input_Changed">
+                            <ComboBoxItem Content="按月定投 (每年 12 期)"/>
+                            <ComboBoxItem Content="按周定投 (每年 52 期)"/>
+                        </ComboBox>
+
+                        <!-- 投资年限 -->
+                        <TextBlock Text="投资长跑期限 (年)" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="12" Margin="0,0,0,6"/>
+                        <TextBox x:Name="TxtYears" Text="10" Background="#181825" Foreground="#FFFFFF" BorderBrush="#45475A" Padding="10,7" FontWeight="Bold" Margin="0,0,0,18" TextChanged="Input_Changed"/>
+
+                        <!-- 预期年化回报率 -->
+                        <Grid Margin="0,0,0,6">
+                            <TextBlock Text="预期年化复合收益率 (CAGR)" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="12" HorizontalAlignment="Left"/>
+                            <TextBlock x:Name="TxtReturnRateDisplay" Text="8.0%" Foreground="#F5B041" FontWeight="Bold" FontSize="14" HorizontalAlignment="Right"/>
+                        </Grid>
+                        <Slider x:Name="SliderReturnRate" Minimum="1" Maximum="30" Value="8" TickFrequency="0.5" IsSnapToTickEnabled="True" ValueChanged="Slider_ValueChanged" Margin="0,4,0,12"/>
+
+                        <!-- 预期年化通胀率 -->
+                        <Grid Margin="0,0,0,6">
+                            <TextBlock Text="预期年化通货膨胀率 (CPI)" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="12" HorizontalAlignment="Left"/>
+                            <TextBlock x:Name="TxtInflationDisplay" Text="2.5%" Foreground="#89B4FA" FontWeight="Bold" FontSize="14" HorizontalAlignment="Right"/>
+                        </Grid>
+                        <Slider x:Name="SliderInflation" Minimum="0" Maximum="8" Value="2.5" TickFrequency="0.1" IsSnapToTickEnabled="True" ValueChanged="Slider_ValueChanged" Margin="0,4,0,12"/>
+
+                        <!-- 基金年化综合费率 -->
+                        <Grid Margin="0,0,0,6">
+                            <TextBlock Text="基金年化综合费率 (管理+托管)" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="12" HorizontalAlignment="Left"/>
+                            <TextBlock x:Name="TxtFeeDisplay" Text="1.2%" Foreground="#F38BA8" FontWeight="Bold" FontSize="14" HorizontalAlignment="Right"/>
+                        </Grid>
+                        <Slider x:Name="SliderFee" Minimum="0" Maximum="3" Value="1.2" TickFrequency="0.1" IsSnapToTickEnabled="True" ValueChanged="Slider_ValueChanged" Margin="0,4,0,8"/>
+                        <TextBlock Text="测算通胀购买力侵蚀与费率长期复利磨损摩擦" Foreground="#6C7086" FontSize="11"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- 右栏：试算结果面板 -->
+                <Border Grid.Column="2" Background="#1E1E2E" CornerRadius="8" Padding="20,18" BorderBrush="#313244" BorderThickness="1">
+                    <StackPanel>
+                        <TextBlock Text="📊 复利试算与真实财富购买力推演看板" Foreground="#89B4FA" FontWeight="Bold" FontSize="14" Margin="0,0,0,16"/>
+
+                        <Grid Margin="0,0,0,14">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="12"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="12"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="12"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Row 0: 本金与资产 -->
+                            <Border Grid.Row="0" Grid.Column="0" Background="#181825" CornerRadius="8" Padding="14,10" BorderBrush="#313244" BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock Text="累计投入总本金" FontSize="11.5" Foreground="#A6ADC8"/>
+                                    <TextBlock x:Name="TxtTotalCost" Text="¥ 130,000" FontSize="18" FontWeight="Bold" Foreground="#CDD6F4" Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Grid.Row="0" Grid.Column="2" Background="#181825" CornerRadius="8" Padding="14,10" BorderBrush="#313244" BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock Text="期末名义总资产" FontSize="11.5" Foreground="#A6ADC8"/>
+                                    <TextBlock x:Name="TxtFinalAsset" Text="¥ 205,821" FontSize="18" FontWeight="Bold" Foreground="#A6E3A1" Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Grid.Row="0" Grid.Column="4" Background="#181825" CornerRadius="8" Padding="14,10" BorderBrush="#313244" BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock Text="真实抗通胀购买力资产" FontSize="11.5" Foreground="#A6ADC8"/>
+                                    <TextBlock x:Name="TxtRealAsset" Text="¥ 160,780" FontSize="18" FontWeight="Bold" Foreground="#F5B041" Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Row 1: 利润与磨损 -->
+                            <Border Grid.Row="2" Grid.Column="0" Background="#181825" CornerRadius="8" Padding="14,10" BorderBrush="#313244" BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock Text="累计净利润 (扣费后)" FontSize="11.5" Foreground="#A6ADC8"/>
+                                    <TextBlock x:Name="TxtTotalProfit" Text="+¥ 75,821" FontSize="18" FontWeight="Bold" Foreground="#F38BA8" Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Grid.Row="2" Grid.Column="2" Background="#181825" CornerRadius="8" Padding="14,10" BorderBrush="#313244" BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock Text="累计总收益率" FontSize="11.5" Foreground="#A6ADC8"/>
+                                    <TextBlock x:Name="TxtReturnRatio" Text="+58.32%" FontSize="18" FontWeight="Bold" Foreground="#FAB387" Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Grid.Row="2" Grid.Column="4" Background="#181825" CornerRadius="8" Padding="14,10" BorderBrush="#313244" BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock Text="通胀+费率侵蚀总损失" FontSize="11.5" Foreground="#A6ADC8"/>
+                                    <TextBlock x:Name="TxtErosionLoss" Text="-¥ 55,200" FontSize="18" FontWeight="Bold" Foreground="#EBA0AC" Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+
+                        <!-- 复利财富增长轨迹图 -->
+                        <Border Background="#181825" CornerRadius="8" Padding="10" BorderBrush="#313244" BorderThickness="1" Margin="0,0,0,12">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="220"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="📈 逐年财富复利轨迹 (投入本金 VS 名义期末资产 VS 真实抗通胀购买力)" Foreground="#89B4FA" FontWeight="Bold" FontSize="12" Margin="4,0,0,6"/>
+                                <sp:WpfPlot Grid.Row="1" x:Name="WealthPlot"/>
+                            </Grid>
+                        </Border>
+
+                        <Border Background="#181825" CornerRadius="8" Padding="12,10" BorderBrush="#45475A" BorderThickness="1" Margin="0,0,0,12">
+                            <TextBlock x:Name="TxtRule72Info" Text="💡 72 法则参考：在 8.0% 年化下，本金翻倍大约需要 9.0 年。" FontSize="12" Foreground="#F9E2AF" TextWrapping="Wrap" LineHeight="18"/>
+                        </Border>
+
+                        <Border Background="#181825" CornerRadius="8" Padding="12,10" BorderBrush="#313244" BorderThickness="1">
+                            <StackPanel>
+                                <TextBlock Text="💡 机构级投研小贴士" FontWeight="SemiBold" FontSize="12" Foreground="#89B4FA" Margin="0,0,0,4"/>
+                                <TextBlock Text="• 费率摩擦的长期复利侵蚀极其巨大：1.2% 的年化费率在 20~30 年的长跑中，往往会蚕食掉 20%~30% 的期末总财富！" FontSize="11" Foreground="#A6ADC8" TextWrapping="Wrap" Margin="0,2"/>
+                                <TextBlock Text="• 通货膨胀如同看不见的重力。只有当投资组合的年化复合回报显著战胜通胀（净实际收益率 > 0）时，资产的实际购买力才是在真正增值。" FontSize="11" Foreground="#A6ADC8" TextWrapping="Wrap" Margin="0,2"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Grid>
+    </ScrollViewer>
+</UserControl>

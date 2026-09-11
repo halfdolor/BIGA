@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/BigaFund/BigaFund.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/BigaFund.Tests/BigaFund.Tests.csproj" />
+  </Folder>
+</Solution>

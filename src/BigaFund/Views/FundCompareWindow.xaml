@@ -1,0 +1,117 @@
+<Window x:Class="BigaFund.Views.FundCompareWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:sp="clr-namespace:ScottPlot.WPF;assembly=ScottPlot.WPF"
+        Title="BIGA - 基金多维对比与对标 PK 擂台" 
+        Height="820" Width="1220"
+        WindowStartupLocation="CenterOwner"
+        Background="#11111B" Foreground="#CDD6F4"
+        FontFamily="Microsoft YaHei UI, Segoe UI">
+    <Grid Margin="18,14">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <!-- 0. 顶部选择与控制栏 -->
+            <RowDefinition Height="*"/>    <!-- 1. 双基走势叠加图 -->
+            <RowDefinition Height="Auto"/> <!-- 2. 核心量化指标对决面板 -->
+        </Grid.RowDefinitions>
+
+        <!-- 0. 顶部对比基金设定与时间选择 -->
+        <Border Grid.Row="0" Background="#1E1E2E" BorderBrush="#313244" BorderThickness="1" CornerRadius="8" Padding="14,10" Margin="0,0,0,12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- 基金 A 输入 -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,16,0">
+                    <Border Background="#89B4FA" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
+                        <TextBlock Text="基金 A (主选)" FontSize="11" FontWeight="Bold" Foreground="#11111B"/>
+                    </Border>
+                    <TextBox x:Name="TxtFundA" Text="000001" Width="80" Background="#181825" Foreground="#89B4FA"
+                             BorderBrush="#45475A" Padding="6,3" FontWeight="Bold" VerticalContentAlignment="Center"/>
+                    <TextBlock x:Name="TxtNameA" Text="华夏成长混合" Foreground="#BAC2DE" FontSize="12" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- VS 图标 -->
+                <TextBlock Grid.Column="1" Text="⚡ VS ⚡" FontWeight="Black" FontSize="14" Foreground="#F5B041" VerticalAlignment="Center" Margin="0,0,16,0"/>
+
+                <!-- 基金 B 输入 -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,20,0">
+                    <Border Background="#F38BA8" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
+                        <TextBlock Text="基金 B (对标)" FontSize="11" FontWeight="Bold" Foreground="#11111B"/>
+                    </Border>
+                    <TextBox x:Name="TxtFundB" Text="005827" Width="80" Background="#181825" Foreground="#F38BA8"
+                             BorderBrush="#45475A" Padding="6,3" FontWeight="Bold" VerticalContentAlignment="Center"/>
+                    <TextBlock x:Name="TxtNameB" Text="易方达蓝筹精选" Foreground="#BAC2DE" FontSize="12" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- 切换时间区间 -->
+                <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="统计区间: " Foreground="#FFFFFF" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                    <ComboBox x:Name="CmbTimeRange" SelectedIndex="3" Width="95" Foreground="#FFFFFF"
+                              SelectionChanged="TimeRange_SelectionChanged">
+                        <ComboBoxItem Content="近1个月" Tag="1M"/>
+                        <ComboBoxItem Content="近3个月" Tag="3M"/>
+                        <ComboBoxItem Content="近6个月" Tag="6M"/>
+                        <ComboBoxItem Content="近1年" Tag="1Y"/>
+                        <ComboBoxItem Content="近3年" Tag="3Y"/>
+                        <ComboBoxItem Content="近5年" Tag="5Y"/>
+                        <ComboBoxItem Content="全部交集" Tag="ALL"/>
+                    </ComboBox>
+                </StackPanel>
+
+                <!-- PK 按钮 -->
+                <Button Grid.Column="5" Content="🥊 立即对比 PK" Width="120"
+                        Background="#F5B041" Foreground="#11111B" BorderThickness="0" FontWeight="Bold" Padding="0,6"
+                        Cursor="Hand" Click="BtnCompare_Click"/>
+            </Grid>
+        </Border>
+
+        <!-- 1. ScottPlot 双基走势叠加图 -->
+        <Border Grid.Row="1" Background="#1E1E2E" BorderBrush="#313244" BorderThickness="1" CornerRadius="8" Padding="0" Margin="0,0,0,12">
+            <sp:WpfPlot x:Name="ComparePlot"/>
+        </Border>
+
+        <!-- 2. 指标对战看板 (Tale of the Tape) -->
+        <Border Grid.Row="2" Background="#1E1E2E" BorderBrush="#313244" BorderThickness="1" CornerRadius="8" Padding="14,10">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Grid Margin="0,0,0,8">
+                    <TextBlock Text="📊 核心量化风控指标对战裁决表 (Higher / Better)" FontSize="13" FontWeight="Bold" Foreground="#89B4FA"/>
+                    <TextBlock x:Name="TxtStatus" Text="对齐就绪" HorizontalAlignment="Right" Foreground="#A6ADC8" FontSize="11"/>
+                </Grid>
+
+                <!-- 对比数据网格 -->
+                <DataGrid x:Name="GridMetrics" Grid.Row="1" AutoGenerateColumns="False" IsReadOnly="True"
+                          Background="#181825" Foreground="#CDD6F4" BorderBrush="#313244" RowBackground="#181825"
+                          AlternatingRowBackground="#1E1E2E" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#313244"
+                          HeadersVisibility="Column" FontSize="12" MaxHeight="220">
+                    <DataGrid.ColumnHeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="Background" Value="#313244"/>
+                            <Setter Property="Foreground" Value="#CDD6F4"/>
+                            <Setter Property="FontWeight" Value="SemiBold"/>
+                            <Setter Property="Padding" Value="8,6"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                        </Style>
+                    </DataGrid.ColumnHeaderStyle>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="核心量化指标" Binding="{Binding MetricName}" Width="190"/>
+                        <DataGridTextColumn Header="基金 A 数值" Binding="{Binding ValueA}" Width="150"/>
+                        <DataGridTextColumn Header="裁决优胜" Binding="{Binding Winner}" Width="140"/>
+                        <DataGridTextColumn Header="基金 B 数值" Binding="{Binding ValueB}" Width="150"/>
+                        <DataGridTextColumn Header="指标经济学释义" Binding="{Binding Description}" Width="*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

@@ -1,0 +1,511 @@
+<UserControl x:Class="BigaFund.Views.FundScreenerControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="#11111B" Foreground="#FFFFFF"
+             FontFamily="Microsoft YaHei UI, Segoe UI">
+    <Grid Margin="18,14">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <!-- 0. 顶部检索与多维筛选过滤栏 -->
+            <RowDefinition Height="*"/>    <!-- 1. 基金筛选结果数据表 -->
+            <RowDefinition Height="Auto"/> <!-- 2. 底部统计与状态栏 -->
+        </Grid.RowDefinitions>
+
+        <!-- 0. 顶部筛选器与搜索 -->
+        <Border Grid.Row="0" Background="#1E1E2E" BorderBrush="#313244" BorderThickness="1" CornerRadius="8" Padding="14,10" Margin="0,0,0,12">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Row 0: 核心维度多维筛选 -->
+                <WrapPanel Grid.Row="0" VerticalAlignment="Center" Margin="0,0,0,8">
+                    <!-- 视图范畴 -->
+                    <TextBlock Text="市场范畴: " Foreground="#FFFFFF" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                    <ComboBox x:Name="CmbViewMode" Width="150" SelectedIndex="0" Foreground="#FFFFFF" Margin="0,0,12,0"
+                              SelectionChanged="CmbViewMode_SelectionChanged">
+                        <ComboBoxItem Content="🏢 本地投研深度池" Tag="LOCAL"/>
+                        <ComboBoxItem Content="🌐 全市场公募大厅 (~1.8万)" Tag="MARKET"/>
+                    </ComboBox>
+
+                    <!-- 关键词搜索 -->
+                    <TextBlock Text="🔍 搜索: " Foreground="#FFFFFF" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                    <TextBox x:Name="TxtKeyword" Width="110" Background="#181825" Foreground="#FFFFFF" BorderBrush="#45475A" 
+                             Padding="6,3" VerticalContentAlignment="Center" Margin="0,0,12,0" TextChanged="TxtKeyword_TextChanged"/>
+
+                    <!-- 品类筛选 -->
+                    <TextBlock Text="品类: " Foreground="#FFFFFF" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                    <ComboBox x:Name="CmbCategory" Width="90" SelectedIndex="0" Foreground="#FFFFFF" Margin="0,0,12,0"
+                              SelectionChanged="CmbCategory_SelectionChanged">
+                        <ComboBoxItem Content="全部品类" Tag="ALL"/>
+                        <ComboBoxItem Content="混合型" Tag="混合"/>
+                        <ComboBoxItem Content="股票型" Tag="股票"/>
+                        <ComboBoxItem Content="指数型" Tag="指数"/>
+                        <ComboBoxItem Content="债券型" Tag="债"/>
+                    </ComboBox>
+
+                    <!-- 板块分类筛选 -->
+                    <TextBlock Text="板块: " Foreground="#FFFFFF" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                    <ComboBox x:Name="CmbSector" Width="105" SelectedIndex="0" Foreground="#FFFFFF" Margin="0,0,12,0"
+                              SelectionChanged="CmbSector_SelectionChanged">
+                        <ComboBoxItem Content="全部板块" Tag="ALL"/>
+                        <ComboBoxItem Content="🏛️ 金融" Tag="金融"/>
+                        <ComboBoxItem Content="🤖 人工智能" Tag="人工智能"/>
+                        <ComboBoxItem Content="⚙️ 机械制造" Tag="机械制造"/>
+                        <ComboBoxItem Content="🧪 化工材料" Tag="化工"/>
+                        <ComboBoxItem Content="💊 医药医疗" Tag="医药医疗"/>
+                        <ComboBoxItem Content="🍶 消费白酒" Tag="消费白酒"/>
+                        <ComboBoxItem Content="⚡ 新能源" Tag="新能源"/>
+                        <ComboBoxItem Content="🛡️ 军工装备" Tag="军工装备"/>
+                        <ComboBoxItem Content="⛏️ 周期资源" Tag="周期资源"/>
+                    </ComboBox>
+
+                    <!-- 量化评级门槛 -->
+                    <TextBlock x:Name="LblGrade" Text="评级: " Foreground="#FFFFFF" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                    <ComboBox x:Name="CmbGrade" Width="105" SelectedIndex="0" Foreground="#FFFFFF" Margin="0,0,12,0"
+                              SelectionChanged="CmbGrade_SelectionChanged">
+                        <ComboBoxItem Content="全部评级" Tag="ALL"/>
+                        <ComboBoxItem Content="🏆 仅看 AAA" Tag="AAA"/>
+                        <ComboBoxItem Content="⭐ AA 及以上" Tag="AA+"/>
+                        <ComboBoxItem Content="🛡️ A 及以上" Tag="A+"/>
+                    </ComboBox>
+
+                    <!-- 策略快筛预设 -->
+                    <TextBlock x:Name="LblStrategy" Text="策略快筛: " Foreground="#FFFFFF" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                    <ComboBox x:Name="CmbStrategy" Width="170" SelectedIndex="0" Foreground="#FFFFFF"
+                              SelectionChanged="CmbStrategy_SelectionChanged">
+                        <ComboBoxItem Content="全部基金" Tag="ALL"/>
+                        <ComboBoxItem Content="🚀 科学买入与增配池" Tag="SCIENTIFIC_BUY"/>
+                        <ComboBoxItem Content="⚡ 短中双优·主升浪" Tag="DOUBLE_EXCELLENT"/>
+                        <ComboBoxItem Content="💎 中期优质·超跌吸筹" Tag="MEDIUM_DIP_ACCUM"/>
+                        <ComboBoxItem Content="🛡️ 稳健低波底仓" Tag="LOW_VOL"/>
+                        <ComboBoxItem Content="🚀 高弹性进取" Tag="HIGH_ALPHA"/>
+                        <ComboBoxItem Content="🏆 AAA 卓越精选" Tag="AAA_ONLY"/>
+                        <ComboBoxItem Content="💎 卡玛比率优选" Tag="CALMAR_ELITE"/>
+                        <ComboBoxItem Content="⚡ 索提诺高下行比" Tag="SORTINO_HIGH"/>
+                        <ComboBoxItem Content="⭐ 晨星等效五星池" Tag="MORNINGSTAR_5STAR"/>
+                    </ComboBox>
+                </WrapPanel>
+
+                <!-- Row 1: 机构级高级量化漏斗 (收益/回撤/夏普/评分精密卡位) -->
+                <WrapPanel Grid.Row="1" VerticalAlignment="Center" Margin="0,0,0,8">
+                    <Border Background="#181825" BorderBrush="#313244" BorderThickness="1" CornerRadius="4" Padding="8,4" Margin="0,0,8,0">
+                        <TextBlock Text="🎯 机构量化漏斗" Foreground="#F5B041" FontWeight="Bold" FontSize="11.5" VerticalAlignment="Center"/>
+                    </Border>
+
+                    <TextBlock Text="近1年收益: " Foreground="#A6ADC8" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                    <ComboBox x:Name="CmbMinReturn" Width="85" SelectedIndex="0" Foreground="#FFFFFF" Margin="0,0,12,0"
+                              SelectionChanged="CmbFunnel_SelectionChanged">
+                        <ComboBoxItem Content="不限" Tag="0"/>
+                        <ComboBoxItem Content="> 0%" Tag="0.01"/>
+                        <ComboBoxItem Content="> 10%" Tag="10"/>
+                        <ComboBoxItem Content="> 20%" Tag="20"/>
+                        <ComboBoxItem Content="> 30%" Tag="30"/>
+                    </ComboBox>
+
+                    <TextBlock Text="最大回撤: " Foreground="#A6ADC8" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                    <ComboBox x:Name="CmbMaxDrawdown" Width="85" SelectedIndex="0" Foreground="#FFFFFF" Margin="0,0,12,0"
+                              SelectionChanged="CmbFunnel_SelectionChanged">
+                        <ComboBoxItem Content="不限" Tag="100"/>
+                        <ComboBoxItem Content="&lt; 10%" Tag="10"/>
+                        <ComboBoxItem Content="&lt; 15%" Tag="15"/>
+                        <ComboBoxItem Content="&lt; 20%" Tag="20"/>
+                        <ComboBoxItem Content="&lt; 25%" Tag="25"/>
+                    </ComboBox>
+
+                    <TextBlock Text="最低夏普: " Foreground="#A6ADC8" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                    <ComboBox x:Name="CmbMinSharpe" Width="85" SelectedIndex="0" Foreground="#FFFFFF" Margin="0,0,12,0"
+                              SelectionChanged="CmbFunnel_SelectionChanged">
+                        <ComboBoxItem Content="不限" Tag="-99"/>
+                        <ComboBoxItem Content="> 0.5" Tag="0.5"/>
+                        <ComboBoxItem Content="> 1.0" Tag="1.0"/>
+                        <ComboBoxItem Content="> 1.5" Tag="1.5"/>
+                        <ComboBoxItem Content="> 2.0" Tag="2.0"/>
+                    </ComboBox>
+
+                    <TextBlock Text="最低量化评分: " Foreground="#A6ADC8" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                    <ComboBox x:Name="CmbMinScore" Width="85" SelectedIndex="0" Foreground="#FFFFFF" Margin="0,0,12,0"
+                              SelectionChanged="CmbFunnel_SelectionChanged">
+                        <ComboBoxItem Content="不限" Tag="0"/>
+                        <ComboBoxItem Content="> 60 分" Tag="60"/>
+                        <ComboBoxItem Content="> 70 分" Tag="70"/>
+                        <ComboBoxItem Content="> 80 分" Tag="80"/>
+                        <ComboBoxItem Content="> 90 分" Tag="90"/>
+                    </ComboBox>
+                </WrapPanel>
+
+                <!-- Row 2: 机构自定义多因子权重打分引擎 (灵活调整收益/抗跌/夏普/底色权重) -->
+                <WrapPanel x:Name="PanelCustomWeights" Grid.Row="2" VerticalAlignment="Center" Margin="0,0,0,8">
+                    <Border Background="#181825" BorderBrush="#313244" BorderThickness="1" CornerRadius="4" Padding="8,4" Margin="0,0,8,0">
+                        <TextBlock Text="🎛️ 自定义因子权重" Foreground="#CBA6F7" FontWeight="Bold" FontSize="11.5" VerticalAlignment="Center"/>
+                    </Border>
+                    <TextBlock Text="收益权重: " Foreground="#A6ADC8" VerticalAlignment="Center" Margin="0,0,3,0"/>
+                    <TextBox x:Name="TxtWeightReturn" Text="30" Width="34" Background="#181825" Foreground="#FFFFFF" BorderBrush="#45475A" Padding="2,2" TextAlignment="Center" TextChanged="WeightInput_TextChanged"/>
+                    <TextBlock Text="%  " Foreground="#6C7086" VerticalAlignment="Center" Margin="0,0,6,0"/>
+
+                    <TextBlock Text="抗跌权重: " Foreground="#A6ADC8" VerticalAlignment="Center" Margin="0,0,3,0"/>
+                    <TextBox x:Name="TxtWeightDrawdown" Text="25" Width="34" Background="#181825" Foreground="#FFFFFF" BorderBrush="#45475A" Padding="2,2" TextAlignment="Center" TextChanged="WeightInput_TextChanged"/>
+                    <TextBlock Text="%  " Foreground="#6C7086" VerticalAlignment="Center" Margin="0,0,6,0"/>
+
+                    <TextBlock Text="夏普权重: " Foreground="#A6ADC8" VerticalAlignment="Center" Margin="0,0,3,0"/>
+                    <TextBox x:Name="TxtWeightSharpe" Text="25" Width="34" Background="#181825" Foreground="#FFFFFF" BorderBrush="#45475A" Padding="2,2" TextAlignment="Center" TextChanged="WeightInput_TextChanged"/>
+                    <TextBlock Text="%  " Foreground="#6C7086" VerticalAlignment="Center" Margin="0,0,6,0"/>
+
+                    <TextBlock Text="基底权重: " Foreground="#A6ADC8" VerticalAlignment="Center" Margin="0,0,3,0"/>
+                    <TextBox x:Name="TxtWeightStability" Text="20" Width="34" Background="#181825" Foreground="#FFFFFF" BorderBrush="#45475A" Padding="2,2" TextAlignment="Center" TextChanged="WeightInput_TextChanged"/>
+                    <TextBlock Text="%  " Foreground="#6C7086" VerticalAlignment="Center" Margin="0,0,8,0"/>
+
+                    <Button Content="⚡ 重新计分" Background="#313244" Foreground="#CBA6F7" BorderBrush="#CBA6F7" BorderThickness="1" Padding="8,2" FontWeight="SemiBold" Cursor="Hand" Click="BtnRecalcWeights_Click" Margin="0,0,8,0"/>
+                    <Button Content="📊 十分位数多空利差回测" Background="#313244" Foreground="#F5B041" BorderBrush="#F5B041" BorderThickness="1" Padding="8,2" FontWeight="SemiBold" Cursor="Hand" Click="BtnDecileSpreadBacktest_Click" Margin="0,0,8,0" ToolTip="对当前基金池执行 D1~D10 十分位数分组回测、多空利差、t统计量与单调性检验"/>
+                    <Button Content="🎯 动态因子时序轮动" Background="#313244" Foreground="#89B4FA" BorderBrush="#89B4FA" BorderThickness="1" Padding="8,2" FontWeight="SemiBold" Cursor="Hand" Click="BtnDynamicFactorTiming_Click" Margin="0,0,12,0" ToolTip="基于五大核心风格因子（低波/价值/动量/质量/小盘）的时序动量与估值分位数，自适应求解宏观轮动配置权重"/>
+                </WrapPanel>
+
+                <!-- Row 3: 排序指标与机构级操作流 -->
+                <DockPanel Grid.Row="3" LastChildFill="False">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock x:Name="LblSort" Text="排序: " Foreground="#FFFFFF" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                        <ComboBox x:Name="CmbSort" Width="185" SelectedIndex="0" Foreground="#FFFFFF" Margin="0,0,12,0"
+                                  SelectionChanged="CmbSort_SelectionChanged">
+                            <ComboBoxItem Content="默认 (更新/代码)"/>
+                            <ComboBoxItem Content="🏆 五维量化综合评分 ⬇"/>
+                            <ComboBoxItem Content="💎 截面多因子标准化总分 ⬇"/>
+                            <ComboBoxItem Content="🚀 动量因子得分 ⬇"/>
+                            <ComboBoxItem Content="🛡️ 尾部防御得分 ⬇"/>
+                            <ComboBoxItem Content="🎯 特质选股 Alpha 纯度 ⬇"/>
+                            <ComboBoxItem Content="🎛️ 定制多因子权重分 ⬇"/>
+                            <ComboBoxItem Content="近1年收益率 ⬇"/>
+                            <ComboBoxItem Content="夏普比率 ⬇"/>
+                            <ComboBoxItem Content="最大回撤 (抗跌) ⬆"/>
+                            <ComboBoxItem Content="最新净值 ⬇"/>
+                            <ComboBoxItem Content="🏆 4433 严选认证优先 ⬇"/>
+                            <ComboBoxItem Content="⭐ 阿尔法持续性得分 ⬇"/>
+                        </ComboBox>
+                        <Button Content="🔄 刷新" Width="60" Margin="0,0,8,0"
+                                Background="#313244" Foreground="#FFFFFF" BorderBrush="#45475A" FontWeight="SemiBold" Padding="0,4"
+                                Click="BtnRefresh_Click"/>
+                        <Button Content="🏆 截面多因子排名" Margin="0,0,10,0"
+                                Background="#313244" Foreground="#F5B041" BorderBrush="#F5B041" BorderThickness="1" FontWeight="SemiBold" Padding="8,4"
+                                Click="BtnCrossSectionalRanking_Click"
+                                ToolTip="启动 Phase 13/14 机构级全池横截面多因子标准化打分引擎 (MAD 去极值 + Z-Score + 动量/风控/防守/纯度/凸性 5 维加权打分)"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
+                        <Button x:Name="BtnSendToPortfolio" Content="🧩 发送至组合 (批量)" Margin="0,0,8,0"
+                                Background="#A6E3A1" Foreground="#11111B" BorderThickness="0" FontWeight="Bold" Padding="12,5"
+                                Cursor="Hand" Click="BtnSendToPortfolio_Click"
+                                ToolTip="将当前勾选或选中的 2~10 只基金一键发送至投资组合配置工作台并自动开启回测"/>
+
+                        <Button x:Name="BtnSendToCompare" Content="🥊 发送至对比 PK" Margin="0,0,8,0"
+                                Background="#CBA6F7" Foreground="#11111B" BorderThickness="0" FontWeight="Bold" Padding="12,5"
+                                Cursor="Hand" Click="BtnSendToCompare_Click"
+                                ToolTip="将当前勾选或选中的 2 只基金一键发送至多基全景 PK 对比台"/>
+
+                        <Button x:Name="BtnExportCsv" Content="📥 导出筛选 (CSV)" Margin="0,0,8,0"
+                                Background="#313244" Foreground="#89B4FA" BorderBrush="#89B4FA" BorderThickness="1" FontWeight="SemiBold" Padding="10,4"
+                                Click="BtnExportCsv_Click" ToolTip="将当前符合条件的基金池导出为 UTF-8 BOM 标准 CSV 表格"/>
+
+                        <Button Content="⚡ 同步全市场公募目录"
+                                Background="#F5B041" Foreground="#11111B" BorderThickness="0" FontWeight="Bold" Padding="12,5"
+                                Cursor="Hand" Click="BtnSyncCatalog_Click"
+                                ToolTip="从东方财富一键同步约 1.8 万只公募基金轻量目录至本地 DuckDB 数据库"/>
+                    </StackPanel>
+                </DockPanel>
+            </Grid>
+        </Border>
+
+        <!-- 1. 基金列表 DataGrid 区域 -->
+        <Border Grid.Row="1" Background="#1E1E2E" BorderBrush="#313244" BorderThickness="1" CornerRadius="8" Padding="0">
+            <Grid>
+                <!-- 本地深度投研数据表 -->
+                <DataGrid x:Name="GridFunds" AutoGenerateColumns="False" IsReadOnly="False" CanUserSortColumns="True"
+                          Background="#181825" Foreground="#FFFFFF" BorderBrush="#313244" RowBackground="#181825"
+                          AlternatingRowBackground="#1E1E2E" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#313244"
+                          HeadersVisibility="Column" FontSize="12" SelectionMode="Extended">
+                    <DataGrid.ColumnHeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="Background" Value="#313244"/>
+                            <Setter Property="Foreground" Value="#FFFFFF"/>
+                            <Setter Property="FontWeight" Value="SemiBold"/>
+                            <Setter Property="Padding" Value="10,6"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                        </Style>
+                    </DataGrid.ColumnHeaderStyle>
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Header="勾选" Width="45">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" 
+                                              HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="基金代码" Binding="{Binding Code}" IsReadOnly="True" Width="75"/>
+                        <DataGridTextColumn Header="基金名称" Binding="{Binding Name}" IsReadOnly="True" Width="170"/>
+                        <DataGridTextColumn Header="量化总分" Binding="{Binding QuantScore, StringFormat={}{0:F1}}" IsReadOnly="True" Width="70" Foreground="#F5B041" FontWeight="Bold"/>
+                        <DataGridTextColumn Header="定制综合分" Binding="{Binding CustomWeightedScore, StringFormat={}{0:F1}}" IsReadOnly="True" Width="75" Foreground="#CBA6F7" FontWeight="Bold"/>
+                        <DataGridTextColumn Header="截面多因子分" Binding="{Binding MultiFactorCompositeScore, StringFormat={}{0:F1}}" IsReadOnly="True" Width="85" Foreground="#94E2D5" FontWeight="Bold"/>
+                        <DataGridTextColumn Header="截面分位" Binding="{Binding MultiFactorPercentile, StringFormat={}{0:F1}%}" IsReadOnly="True" Width="70" Foreground="#F5C2E7" FontWeight="SemiBold"/>
+                        <DataGridTextColumn Header="机构标签" Binding="{Binding MultiFactorRatingTag}" Width="85" Foreground="#F9E2AF" FontWeight="Bold"/>
+                        <DataGridTextColumn Header="4433严选" Binding="{Binding Passed4433Tag}" IsReadOnly="True" Width="80" Foreground="#F9E2AF" FontWeight="Bold"/>
+                        <DataGridTextColumn Header="Alpha持续" Binding="{Binding AlphaPersistenceScore, StringFormat={}{0:F1}}" IsReadOnly="True" Width="75" Foreground="#A6E3A1" FontWeight="Bold"/>
+                        <DataGridTextColumn Header="投决信号" Binding="{Binding ScientificActionSignal}" IsReadOnly="True" Width="85" Foreground="#F5B041" FontWeight="Bold"/>
+                        <DataGridTextColumn Header="短中格局" Binding="{Binding ConcordanceType}" IsReadOnly="True" Width="95" Foreground="#CBA6F7" FontWeight="SemiBold"/>
+                        <DataGridTextColumn Header="短期分" Binding="{Binding ShortTermScore, StringFormat={}{0:F1}}" IsReadOnly="True" Width="60" Foreground="#89B4FA" FontWeight="Bold"/>
+                        <DataGridTextColumn Header="中期分" Binding="{Binding MediumTermScore, StringFormat={}{0:F1}}" IsReadOnly="True" Width="60" Foreground="#A6E3A1" FontWeight="Bold"/>
+                        <DataGridTextColumn Header="置信度" Binding="{Binding ScientificConviction, StringFormat={}{0:F0}%}" IsReadOnly="True" Width="60" Foreground="#F9E2AF" FontWeight="SemiBold"/>
+                        <DataGridTextColumn Header="评级" Binding="{Binding RatingGrade}" Width="65" Foreground="#A6E3A1" FontWeight="SemiBold"/>
+                        <DataGridTextColumn Header="板块" Binding="{Binding Sector}" Width="75" Foreground="#89B4FA" FontWeight="SemiBold"/>
+                        <DataGridTextColumn Header="类型" Binding="{Binding Type}" Width="85"/>
+                        <DataGridTextColumn Header="经理" Binding="{Binding Manager}" Width="75"/>
+                        <DataGridTextColumn Header="最新净值" Binding="{Binding LatestNav, StringFormat={}{0:F4}}" Width="80"/>
+                        <DataGridTextColumn Header="近1年收益" Binding="{Binding Return1Y, StringFormat={}{0:+0.00;-0.00;0.00}%}" Width="85"/>
+                        <DataGridTextColumn Header="最大回撤" Binding="{Binding MaxDrawdown, StringFormat={}{0:F2}%}" Width="80"/>
+                        <DataGridTextColumn Header="夏普比率" Binding="{Binding SharpeRatio, StringFormat={}{0:F2}}" Width="75"/>
+                        <DataGridTextColumn Header="年化波动率" Binding="{Binding AnnualizedVol, StringFormat={}{0:F2}%}" Width="85"/>
+                        <DataGridTextColumn Header="规模" Binding="{Binding FundSize}" Width="75"/>
+                        <DataGridTemplateColumn Header="投研联动操作" Width="*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button Content="📊 在主面板分析" Tag="{Binding Code}" Margin="0,0,6,0"
+                                                Background="#89B4FA" Foreground="#11111B" BorderThickness="0" FontWeight="Bold" Padding="8,2"
+                                                Click="BtnOpenMain_Click"/>
+                                        <Button Content="🥊 PK擂台" Tag="{Binding Code}" Margin="0,0,6,0"
+                                                Background="#F5B041" Foreground="#11111B" BorderThickness="0" FontWeight="Bold" Padding="8,2"
+                                                Click="BtnOpenCompare_Click"/>
+                                        <Button Content="⭐ 加自选" Tag="{Binding Code}"
+                                                Background="#313244" Foreground="#FFFFFF" BorderBrush="#45475A" Padding="8,2"
+                                                Click="BtnAddFavorite_Click"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <!-- 全市场公募大厅检索表 -->
+                <DataGrid x:Name="GridMarketCatalog" AutoGenerateColumns="False" IsReadOnly="True" CanUserSortColumns="True"
+                          Background="#181825" Foreground="#FFFFFF" BorderBrush="#313244" RowBackground="#181825"
+                          AlternatingRowBackground="#1E1E2E" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#313244"
+                          HeadersVisibility="Column" FontSize="12" SelectionMode="Single" Visibility="Collapsed">
+                    <DataGrid.ColumnHeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="Background" Value="#313244"/>
+                            <Setter Property="Foreground" Value="#FFFFFF"/>
+                            <Setter Property="FontWeight" Value="SemiBold"/>
+                            <Setter Property="Padding" Value="10,6"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                        </Style>
+                    </DataGrid.ColumnHeaderStyle>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="基金代码" Binding="{Binding Code}" Width="85" FontWeight="Bold"/>
+                        <DataGridTextColumn Header="拼音缩写" Binding="{Binding Pinyin}" Width="80" Foreground="#BAC2DE"/>
+                        <DataGridTextColumn Header="公募基金全称" Binding="{Binding Name}" Width="250" FontWeight="SemiBold"/>
+                        <DataGridTextColumn Header="板块" Binding="{Binding Sector}" Width="80" Foreground="#F5B041" FontWeight="SemiBold"/>
+                        <DataGridTextColumn Header="投资类型" Binding="{Binding Type}" Width="120"/>
+                        <DataGridTextColumn Header="全拼" Binding="{Binding PinyinFull}" Width="180" Foreground="#6C7086"/>
+                        <DataGridTemplateColumn Header="快速建仓与投研操作" Width="*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button Content="📥 解析入库并在主面板分析" Tag="{Binding Code}" Margin="0,0,6,0"
+                                                Background="#89B4FA" Foreground="#11111B" BorderThickness="0" FontWeight="Bold" Padding="8,2"
+                                                Click="BtnMarketIngestAndOpen_Click"/>
+                                        <Button Content="🥊 PK擂台" Tag="{Binding Code}" Margin="0,0,6,0"
+                                                Background="#F5B041" Foreground="#11111B" BorderThickness="0" FontWeight="Bold" Padding="8,2"
+                                                Click="BtnOpenCompare_Click"/>
+                                        <Button Content="⭐ 加自选" Tag="{Binding Code}"
+                                                Background="#313244" Foreground="#FFFFFF" BorderBrush="#45475A" Padding="8,2"
+                                                Click="BtnAddFavoriteCatalog_Click"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <ProgressBar x:Name="ScreenerProgress" IsIndeterminate="True" Width="200" Height="6" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="Collapsed"/>
+
+                <!-- 截面多因子十分位数回测与单调性检验弹层 (Decile Backtest Modal) -->
+                <Border x:Name="BorderDecileModal" Background="#181825" BorderBrush="#89B4FA" BorderThickness="1.5" CornerRadius="8"
+                        Padding="14" Margin="30" Visibility="Collapsed">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/> <!-- 0. 顶栏标题与关闭 -->
+                            <RowDefinition Height="Auto"/> <!-- 1. 因子选择与操作栏 -->
+                            <RowDefinition Height="Auto"/> <!-- 2. 统计摘要卡片 -->
+                            <RowDefinition Height="*"/>    <!-- 3. D1~D10 梯队表现 DataGrid -->
+                            <RowDefinition Height="Auto"/> <!-- 4. 底部因子诊断 -->
+                        </Grid.RowDefinitions>
+
+                        <!-- 0. 顶栏标题与关闭 -->
+                        <DockPanel Grid.Row="0" Margin="0,0,0,10">
+                            <TextBlock Text="📊 截面多因子全市场选基十分位数 (D1~D10) 回测与单调性检验" FontSize="14" FontWeight="Bold" Foreground="#89B4FA" VerticalAlignment="Center"/>
+                            <Button Content="✕ 关闭" DockPanel.Dock="Right" Background="#313244" Foreground="#FFFFFF" BorderBrush="#45475A" Padding="10,3" FontWeight="SemiBold" Cursor="Hand" Click="BtnCloseDecileModal_Click"/>
+                        </DockPanel>
+
+                        <!-- 1. 因子选择与操作栏 -->
+                        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,10">
+                            <TextBlock Text="检验因子标的:" Foreground="#CDD6F4" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <ComboBox x:Name="CmbDecileFactor" Width="170" SelectedIndex="0" Foreground="#FFFFFF" Margin="0,0,10,0">
+                                <ComboBoxItem Content="🏆 综合多因子打分" Tag="Composite"/>
+                                <ComboBoxItem Content="🚀 截面动量动能因子" Tag="Momentum"/>
+                                <ComboBoxItem Content="⚖️ 风险调整性价比" Tag="RiskAdjusted"/>
+                                <ComboBoxItem Content="🛡️ 下行防御盾牌因子" Tag="DownsideDefense"/>
+                                <ComboBoxItem Content="💎 纯粹Alpha剥离因子" Tag="AlphaPurity"/>
+                                <ComboBoxItem Content="📈 凸性不对称跟涨因子" Tag="Convexity"/>
+                                <ComboBoxItem Content="⏳ Alpha跨期持续性因子" Tag="AlphaPersistence"/>
+                            </ComboBox>
+                            <Button Content="🚀 开始检验回测" Padding="12,4" Background="#F5B041" Foreground="#11111B" BorderThickness="0" FontWeight="Bold" Cursor="Hand" Click="BtnRunDecileTest_Click"/>
+                        </StackPanel>
+
+                        <!-- 2. 统计摘要卡片 -->
+                        <UniformGrid Grid.Row="2" Columns="5" Margin="0,0,0,10">
+                            <Border Background="#1E1E2E" CornerRadius="6" Padding="10,6" Margin="3" BorderBrush="#313244" BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock Text="D1-D10 多空年化利差" Foreground="#A6ADC8" FontSize="11"/>
+                                    <TextBlock x:Name="TxtDecileSpread" Text="--%" FontSize="16" FontWeight="Bold" Foreground="#F38BA8" Margin="0,3,0,0"/>
+                                    <TextBlock Text="多空对冲年化收益" Foreground="#BAC2DE" FontSize="10" Margin="0,2,0,0"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Background="#1E1E2E" CornerRadius="6" Padding="10,6" Margin="3" BorderBrush="#313244" BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock Text="多空利差夏普比率" Foreground="#A6ADC8" FontSize="11"/>
+                                    <TextBlock x:Name="TxtDecileSharpe" Text="--" FontSize="16" FontWeight="Bold" Foreground="#F5B041" Margin="0,3,0,0"/>
+                                    <TextBlock Text="多空稳定性指标" Foreground="#BAC2DE" FontSize="10" Margin="0,2,0,0"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Background="#1E1E2E" CornerRadius="6" Padding="10,6" Margin="3" BorderBrush="#313244" BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock Text="t 统计量 (显著性)" Foreground="#A6ADC8" FontSize="11"/>
+                                    <TextBlock x:Name="TxtDecileTStat" Text="--" FontSize="16" FontWeight="Bold" Foreground="#89B4FA" Margin="0,3,0,0"/>
+                                    <TextBlock x:Name="TxtDecileSigBadge" Text="|t| > 2.0 显著" Foreground="#BAC2DE" FontSize="10" Margin="0,2,0,0"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Background="#1E1E2E" CornerRadius="6" Padding="10,6" Margin="3" BorderBrush="#313244" BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock Text="收益单调性得分" Foreground="#A6ADC8" FontSize="11"/>
+                                    <TextBlock x:Name="TxtDecileMonotonicity" Text="--%" FontSize="16" FontWeight="Bold" Foreground="#A6E3A1" Margin="0,3,0,0"/>
+                                    <TextBlock x:Name="TxtDecileSpearman" Text="Spearman ρ: --" Foreground="#BAC2DE" FontSize="10" Margin="0,2,0,0"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Background="#1E1E2E" CornerRadius="6" Padding="10,6" Margin="3" BorderBrush="#313244" BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock Text="因子有效性评级" Foreground="#A6ADC8" FontSize="11"/>
+                                    <TextBlock x:Name="TxtDecileGrade" Text="--" FontSize="16" FontWeight="Bold" Foreground="#CBA6F7" Margin="0,3,0,0"/>
+                                    <TextBlock Text="十分位单调区分度" Foreground="#BAC2DE" FontSize="10" Margin="0,2,0,0"/>
+                                </StackPanel>
+                            </Border>
+                        </UniformGrid>
+
+                        <!-- 3. D1~D10 梯队表现 DataGrid -->
+                        <DataGrid Grid.Row="3" x:Name="GridDecileLadder" AutoGenerateColumns="False" IsReadOnly="True"
+                                  Background="#1E1E2E" RowBackground="#181825" AlternatingRowBackground="#1E1E2E"
+                                  Foreground="#FFFFFF" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#313244"
+                                  HeadersVisibility="Column" BorderThickness="1" BorderBrush="#313244" MaxHeight="220" VerticalScrollBarVisibility="Auto">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="十分位" Binding="{Binding DecileName}" Width="70" FontWeight="Bold"/>
+                                <DataGridTextColumn Header="角色分层" Binding="{Binding DecileRole}" Width="150"/>
+                                <DataGridTextColumn Header="基数" Binding="{Binding FundCount}" Width="65"/>
+                                <DataGridTextColumn Header="年化收益" Binding="{Binding AnnualizedReturn, StringFormat={}{0:F2}%}" Width="95" Foreground="#F38BA8" FontWeight="Bold"/>
+                                <DataGridTextColumn Header="年化波动" Binding="{Binding AnnualizedVolatility, StringFormat={}{0:F2}%}" Width="95"/>
+                                <DataGridTextColumn Header="夏普比率" Binding="{Binding SharpeRatio, StringFormat={}{0:F2}}" Width="85" Foreground="#F5B041"/>
+                                <DataGridTextColumn Header="最大回撤" Binding="{Binding MaxDrawdown, StringFormat={}{0:F2}%}" Width="95" Foreground="#A6E3A1"/>
+                                <DataGridTextColumn Header="胜率" Binding="{Binding WinRatePercent, StringFormat={}{0:F1}%}" Width="80"/>
+                                <DataGridTextColumn Header="超额基准" Binding="{Binding ExcessOverMarketPercent, StringFormat={}{0:+0.00;-0.00}%}" Width="95"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                        <!-- 4. 底部因子诊断 -->
+                        <Border Grid.Row="4" Background="#1E1E2E" CornerRadius="4" Padding="8,6" Margin="0,8,0,0" BorderBrush="#313244" BorderThickness="1">
+                            <TextBlock x:Name="TxtDecileDiagnosis" Text="请选择因子并点击“开始检验回测”以分析因子十分位单调性与利差。" FontSize="11" Foreground="#BAC2DE" TextWrapping="Wrap"/>
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <!-- 动态因子时序择时与轮动中枢弹层 (Factor Timing Modal Phase 23) -->
+                <Border x:Name="BorderFactorTimingModal" Background="#181825" BorderBrush="#CBA6F7" BorderThickness="1.5" CornerRadius="8"
+                        Padding="14" Margin="30" Visibility="Collapsed">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/> <!-- 0. 顶栏标题与关闭 -->
+                            <RowDefinition Height="Auto"/> <!-- 1. 宏观体制与核心因子概览卡片 -->
+                            <RowDefinition Height="*"/>    <!-- 2. 五大风格因子动量/估值/轮动 DataGrid -->
+                            <RowDefinition Height="Auto"/> <!-- 3. 宏观因子配置建议与诊断 -->
+                        </Grid.RowDefinitions>
+
+                        <!-- 0. 顶栏标题与关闭 -->
+                        <DockPanel Grid.Row="0" Margin="0,0,0,10">
+                            <TextBlock Text="🎯 机构级动态因子时序择时与动量-估值自适应轮动中枢 (Phase 23)" FontSize="14" FontWeight="Bold" Foreground="#CBA6F7" VerticalAlignment="Center"/>
+                            <Button Content="✕ 关闭" DockPanel.Dock="Right" Background="#313244" Foreground="#FFFFFF" BorderBrush="#45475A" Padding="10,3" FontWeight="SemiBold" Cursor="Hand" Click="BtnCloseFactorTimingModal_Click"/>
+                        </DockPanel>
+
+                        <!-- 1. 宏观体制与核心因子概览卡片 -->
+                        <UniformGrid Grid.Row="1" Columns="4" Margin="0,0,0,10">
+                            <Border Background="#1E1E2E" CornerRadius="6" Padding="10,6" Margin="3" BorderBrush="#313244" BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock Text="当前宏观市场体制" Foreground="#A6ADC8" FontSize="11"/>
+                                    <TextBlock x:Name="TxtTimingRegime" Text="--" FontSize="15" FontWeight="Bold" Foreground="#89B4FA" Margin="0,3,0,0"/>
+                                    <TextBlock x:Name="TxtTimingConfidence" Text="模型置信度: --%" Foreground="#BAC2DE" FontSize="10" Margin="0,2,0,0"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Background="#1E1E2E" CornerRadius="6" Padding="10,6" Margin="3" BorderBrush="#313244" BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock Text="核心建议超配因子" Foreground="#A6ADC8" FontSize="11"/>
+                                    <TextBlock x:Name="TxtTimingTopOverweight" Text="--" FontSize="16" FontWeight="Bold" Foreground="#A6E3A1" Margin="0,3,0,0"/>
+                                    <TextBlock Text="高动量/合理估值加权" Foreground="#BAC2DE" FontSize="10" Margin="0,2,0,0"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Background="#1E1E2E" CornerRadius="6" Padding="10,6" Margin="3" BorderBrush="#313244" BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock Text="核心建议低配因子" Foreground="#A6ADC8" FontSize="11"/>
+                                    <TextBlock x:Name="TxtTimingTopUnderweight" Text="--" FontSize="16" FontWeight="Bold" Foreground="#F38BA8" Margin="0,3,0,0"/>
+                                    <TextBlock Text="拥挤度过高或动量失速" Foreground="#BAC2DE" FontSize="10" Margin="0,2,0,0"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Background="#1E1E2E" CornerRadius="6" Padding="10,6" Margin="3" BorderBrush="#313244" BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock Text="截面因子离散度" Foreground="#A6ADC8" FontSize="11"/>
+                                    <TextBlock x:Name="TxtTimingDispersion" Text="--%" FontSize="16" FontWeight="Bold" Foreground="#F5B041" Margin="0,3,0,0"/>
+                                    <TextBlock Text="因子分化轮动机会" Foreground="#BAC2DE" FontSize="10" Margin="0,2,0,0"/>
+                                </StackPanel>
+                            </Border>
+                        </UniformGrid>
+
+                        <!-- 2. 五大风格因子动量/估值/轮动 DataGrid -->
+                        <DataGrid Grid.Row="2" x:Name="GridFactorTiming" AutoGenerateColumns="False" IsReadOnly="True"
+                                  Background="#1E1E2E" RowBackground="#181825" AlternatingRowBackground="#1E1E2E"
+                                  Foreground="#FFFFFF" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#313244"
+                                  HeadersVisibility="Column" BorderThickness="1" BorderBrush="#313244" MaxHeight="220" VerticalScrollBarVisibility="Auto">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="核心风格因子" Binding="{Binding FactorName}" Width="110" FontWeight="Bold"/>
+                                <DataGridTextColumn Header="1月短期动量" Binding="{Binding ShortTermMomentum1M, StringFormat={}{0:+0.0;-0.0}%}" Width="95" Foreground="#F38BA8"/>
+                                <DataGridTextColumn Header="3月中期动量" Binding="{Binding MediumTermMomentum3M, StringFormat={}{0:+0.0;-0.0}%}" Width="95"/>
+                                <DataGridTextColumn Header="12月长期动量" Binding="{Binding LongTermMomentum12M, StringFormat={}{0:+0.0;-0.0}%}" Width="95"/>
+                                <DataGridTextColumn Header="估值Z-Score" Binding="{Binding ValuationSpreadZScore, StringFormat={}{0:F2}}" Width="90"/>
+                                <DataGridTextColumn Header="拥挤度分级" Binding="{Binding FactorCrowdingLevel}" Width="95"/>
+                                <DataGridTextColumn Header="轮动战术姿态" Binding="{Binding RotationStance}" Width="125"/>
+                                <DataGridTextColumn Header="模型推荐权重" Binding="{Binding RecommendedWeightPercent, StringFormat={}{0:F1}%}" Width="105" Foreground="#A6E3A1" FontWeight="Bold"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                        <!-- 3. 宏观因子配置建议与诊断 -->
+                        <Border Grid.Row="3" Background="#1E1E2E" CornerRadius="4" Padding="8,6" Margin="0,8,0,0" BorderBrush="#313244" BorderThickness="1">
+                            <TextBlock x:Name="TxtTimingDiagnosis" Text="正在分析宏观因子时序轮动状态..." FontSize="11" Foreground="#BAC2DE" TextWrapping="Wrap"/>
+                        </Border>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- 2. 底部状态栏 -->
+        <Border Grid.Row="2" Margin="0,10,0,0">
+            <Grid>
+                <TextBlock x:Name="TxtSummary" Text="正在加载基金池..." Foreground="#A6ADC8" FontSize="12" VerticalAlignment="Center"/>
+                <TextBlock Text="支持 DuckDB 本地超高速索引 · 离线秒级检索" Foreground="#585B70" FontSize="11" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

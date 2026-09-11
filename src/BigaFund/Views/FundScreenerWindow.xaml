@@ -1,0 +1,138 @@
+<Window x:Class="BigaFund.Views.FundScreenerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="BIGA - 全市场与自选池量化多维选基工作台 (Fund Screener)" 
+        Height="720" Width="1160"
+        WindowStartupLocation="CenterOwner"
+        Background="#11111B" Foreground="#CDD6F4"
+        FontFamily="Microsoft YaHei UI, Segoe UI">
+    <Grid Margin="18,14">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <!-- 0. 顶部检索与多维筛选过滤栏 -->
+            <RowDefinition Height="*"/>    <!-- 1. 基金筛选结果数据表 -->
+            <RowDefinition Height="Auto"/> <!-- 2. 底部统计与状态栏 -->
+        </Grid.RowDefinitions>
+
+        <!-- 0. 顶部筛选器与搜索 -->
+        <Border Grid.Row="0" Background="#1E1E2E" BorderBrush="#313244" BorderThickness="1" CornerRadius="8" Padding="14,10" Margin="0,0,0,12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="95"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="110"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="135"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- 关键词搜索 -->
+                <TextBlock Text="🔍 搜索过滤: " Foreground="#A6ADC8" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <TextBox x:Name="TxtKeyword" Grid.Column="1" Background="#181825" Foreground="#CDD6F4" BorderBrush="#45475A" 
+                         Padding="6,3" VerticalContentAlignment="Center" TextChanged="TxtKeyword_TextChanged"/>
+
+                <!-- 分类筛选 -->
+                <TextBlock Grid.Column="2" Text="品类过滤: " Foreground="#FFFFFF" FontWeight="SemiBold" VerticalAlignment="Center" Margin="10,0,6,0"/>
+                <ComboBox x:Name="CmbCategory" Grid.Column="3" SelectedIndex="0" Foreground="#FFFFFF"
+                          SelectionChanged="CmbCategory_SelectionChanged">
+                    <ComboBoxItem Content="全部品类" Tag="ALL"/>
+                    <ComboBoxItem Content="混合型" Tag="混合"/>
+                    <ComboBoxItem Content="股票型" Tag="股票"/>
+                    <ComboBoxItem Content="指数型" Tag="指数"/>
+                    <ComboBoxItem Content="债券型" Tag="债"/>
+                </ComboBox>
+
+                <!-- 板块分类筛选 -->
+                <TextBlock Grid.Column="4" Text="板块过滤: " Foreground="#FFFFFF" FontWeight="SemiBold" VerticalAlignment="Center" Margin="10,0,6,0"/>
+                <ComboBox x:Name="CmbSector" Grid.Column="5" SelectedIndex="0" Foreground="#FFFFFF"
+                          SelectionChanged="CmbSector_SelectionChanged">
+                    <ComboBoxItem Content="全部板块" Tag="ALL"/>
+                    <ComboBoxItem Content="🏛️ 金融" Tag="金融"/>
+                    <ComboBoxItem Content="🤖 人工智能" Tag="人工智能"/>
+                    <ComboBoxItem Content="⚙️ 机械制造" Tag="机械制造"/>
+                    <ComboBoxItem Content="🧪 化工材料" Tag="化工"/>
+                    <ComboBoxItem Content="💊 医药医疗" Tag="医药医疗"/>
+                    <ComboBoxItem Content="🍶 消费白酒" Tag="消费白酒"/>
+                    <ComboBoxItem Content="⚡ 新能源" Tag="新能源"/>
+                    <ComboBoxItem Content="🛡️ 军工装备" Tag="军工装备"/>
+                    <ComboBoxItem Content="⛏️ 周期资源" Tag="周期资源"/>
+                </ComboBox>
+
+                <!-- 量化排序筛选 -->
+                <TextBlock Grid.Column="6" Text="量化排序: " Foreground="#FFFFFF" FontWeight="SemiBold" VerticalAlignment="Center" Margin="10,0,6,0"/>
+                <ComboBox x:Name="CmbSort" Grid.Column="7" SelectedIndex="0" Foreground="#FFFFFF"
+                          SelectionChanged="CmbSort_SelectionChanged">
+                    <ComboBoxItem Content="默认 (最近更新)"/>
+                    <ComboBoxItem Content="近1年收益率 ⬇"/>
+                    <ComboBoxItem Content="夏普比率 (最优) ⬇"/>
+                    <ComboBoxItem Content="最大回撤 (低波动) ⬆"/>
+                    <ComboBoxItem Content="最新净值 ⬇"/>
+                </ComboBox>
+
+                <!-- 刷新按钮 -->
+                <Button Grid.Column="9" Content="🔄 刷新基金库" Width="105"
+                        Background="#313244" Foreground="#CDD6F4" BorderBrush="#45475A" FontWeight="SemiBold" Padding="0,5"
+                        Click="BtnRefresh_Click"/>
+            </Grid>
+        </Border>
+
+        <!-- 1. 基金列表 DataGrid -->
+        <Border Grid.Row="1" Background="#1E1E2E" BorderBrush="#313244" BorderThickness="1" CornerRadius="8" Padding="0">
+            <DataGrid x:Name="GridFunds" AutoGenerateColumns="False" IsReadOnly="True" CanUserSortColumns="True"
+                      Background="#181825" Foreground="#CDD6F4" BorderBrush="#313244" RowBackground="#181825"
+                      AlternatingRowBackground="#1E1E2E" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#313244"
+                      HeadersVisibility="Column" FontSize="12" SelectionMode="Single">
+                <DataGrid.ColumnHeaderStyle>
+                    <Style TargetType="DataGridColumnHeader">
+                        <Setter Property="Background" Value="#313244"/>
+                        <Setter Property="Foreground" Value="#CDD6F4"/>
+                        <Setter Property="FontWeight" Value="SemiBold"/>
+                        <Setter Property="Padding" Value="10,6"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                    </Style>
+                </DataGrid.ColumnHeaderStyle>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="基金代码" Binding="{Binding Code}" Width="75"/>
+                    <DataGridTextColumn Header="基金名称" Binding="{Binding Name}" Width="180"/>
+                    <DataGridTextColumn Header="板块" Binding="{Binding Sector}" Width="75" Foreground="#F5B041" FontWeight="SemiBold"/>
+                    <DataGridTextColumn Header="类型" Binding="{Binding Type}" Width="90"/>
+                    <DataGridTextColumn Header="经理" Binding="{Binding Manager}" Width="80"/>
+                    <DataGridTextColumn Header="最新净值" Binding="{Binding LatestNav, StringFormat={}{0:F4}}" Width="80"/>
+                    <DataGridTextColumn Header="近1年收益" Binding="{Binding Return1Y, StringFormat={}{0:+0.00;-0.00;0.00}%}" Width="85"/>
+                    <DataGridTextColumn Header="最大回撤" Binding="{Binding MaxDrawdown, StringFormat={}{0:F2}%}" Width="80"/>
+                    <DataGridTextColumn Header="夏普比率" Binding="{Binding SharpeRatio, StringFormat={}{0:F2}}" Width="75"/>
+                    <DataGridTextColumn Header="年化波动率" Binding="{Binding AnnualizedVol, StringFormat={}{0:F2}%}" Width="85"/>
+                    <DataGridTextColumn Header="规模" Binding="{Binding FundSize}" Width="75"/>
+                    <DataGridTemplateColumn Header="投研联动操作" Width="*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Content="📊 在主面板分析" Tag="{Binding Code}" Margin="0,0,6,0"
+                                            Background="#89B4FA" Foreground="#11111B" BorderThickness="0" FontWeight="Bold" Padding="8,2"
+                                            Click="BtnOpenMain_Click"/>
+                                    <Button Content="🥊 PK擂台" Tag="{Binding Code}" Margin="0,0,6,0"
+                                            Background="#F5B041" Foreground="#11111B" BorderThickness="0" FontWeight="Bold" Padding="8,2"
+                                            Click="BtnOpenCompare_Click"/>
+                                    <Button Content="⭐ 加自选" Tag="{Binding Code}"
+                                            Background="#313244" Foreground="#BAC2DE" BorderBrush="#45475A" Padding="8,2"
+                                            Click="BtnAddFavorite_Click"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+
+        <!-- 2. 底部状态栏 -->
+        <Border Grid.Row="2" Margin="0,10,0,0">
+            <Grid>
+                <TextBlock x:Name="TxtSummary" Text="正在加载基金池..." Foreground="#A6ADC8" FontSize="12" VerticalAlignment="Center"/>
+                <TextBlock Text="支持 DuckDB 本地超高速索引 · 离线秒级检索" Foreground="#585B70" FontSize="11" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
